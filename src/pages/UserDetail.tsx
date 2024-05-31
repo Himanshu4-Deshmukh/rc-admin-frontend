@@ -1,5 +1,3 @@
-// src/pages/UserDetail.tsx
-
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -21,16 +19,35 @@ interface User {
 const UserDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<User | null>(null);
+  const [credits, setCredits] = useState<number>(0);
+  const [statusMessage, setStatusMessage] = useState<string>('');
 
   useEffect(() => {
     axios.get(`https://rc-admin-backend.onrender.com/users/${id}`)
       .then(response => {
         setUser(response.data);
+        setCredits(response.data.credits); // Initialize credits state with user's current credits
       })
       .catch(error => {
         console.error('Error fetching user data:', error);
       });
   }, [id]);
+
+  const handleCreditsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCredits(Number(event.target.value));
+  };
+
+  const handleUpdateCredits = () => {
+    axios.put(`https://rc-admin-backend.onrender.com/users/${id}`, { credits })
+      .then(response => {
+        setUser(response.data);
+        setStatusMessage('Credits updated successfully');
+      })
+      .catch(error => {
+        console.error('Error updating credits:', error);
+        setStatusMessage('Credits update failed');
+      });
+  };
 
   if (!user) {
     return <div>Loading...</div>;
@@ -133,6 +150,32 @@ const UserDetail = () => {
           <div className="col-span-1 flex items-center">
             <p className="text-sm text-black dark:text-white">{new Date(user.date).toLocaleDateString()}</p>
           </div>
+        </div>
+
+        {/* Update Credits Section */}
+        <div className="py-4.5 px-4 dark:border-strokedark md:px-6 2xl:px-7.5">
+          <h4 className="text-xl font-semibold text-black dark:text-white">
+            Update Credits
+          </h4>
+          <div className="flex items-center">
+            <input
+              type="number"
+              value={credits}
+              onChange={handleCreditsChange}
+              className="mr-4 p-2 border rounded"
+            />
+            <button
+              onClick={handleUpdateCredits}
+              className="bg-blue-500 text-white py-2 px-4 rounded"
+            >
+              Update
+            </button>
+          </div>
+          {statusMessage && (
+            <div className={`mt-4 ${statusMessage.includes('success') ? 'text-green-500' : 'text-red-500'}`}>
+              {statusMessage}
+            </div>
+          )}
         </div>
       </div>
     </DefaultLayout>
