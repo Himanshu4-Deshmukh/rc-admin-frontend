@@ -1,32 +1,45 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-interface CardDataStatsProps {
-  title: string;
-  total: string;
-  rate: string;
-  levelUp: boolean;
-  children: React.ReactNode;
-  onClick?: () => void;
-}
-
-const CardDataStats: React.FC<CardDataStatsProps> = ({ title, total, rate, levelUp, children, onClick }) => {
+const CardDataStats = ({ title, total, rate, levelUp, children, onClick, borderColor }) => {
   return (
-    <div className="p-4 bg-white shadow-md rounded-md border border-gray-200 cursor-pointer" onClick={onClick}>
-      <h4 className="text-lg font-semibold text-gray-800 mb-2">{title}</h4>
-      <div className="flex items-center justify-between">
+    <div
+      className="bg-white p-4 rounded-lg shadow-md cursor-pointer transition-transform transform hover:scale-105"
+      onClick={onClick}
+      style={{ borderBottom: `4px solid ${borderColor}` }}
+    >
+      <div className="flex justify-between items-center">
         <div>
-          {children}
+          <h5 className="text-gray-600 font-medium">{title}</h5>
+          <p className="text-2xl font-semibold text-black">{total}</p>
+          {/* {rate && (
+            <div className={`flex items-center ${levelUp ? 'text-green-500' : 'text-red-500'}`}>
+              {levelUp ? '▲' : '▼'} {rate}
+            </div>
+          )} */}
         </div>
-        <div className="text-gray-700">
-          <div className="text-xl font-bold">{total}</div>
-          {/* <div className="flex items-center">
-            <span className="text-sm font-medium mr-1">{rate}</span>
-            {levelUp ? <span className="text-green-500">&#9650;</span> : <span className="text-red-500">&#9660;</span>}
-          </div> */}
-        </div>
+        <div className="text-gray-400">{children}</div>
       </div>
     </div>
   );
+};
+
+CardDataStats.propTypes = {
+  title: PropTypes.string.isRequired,
+  total: PropTypes.string.isRequired,
+  rate: PropTypes.string,
+  levelUp: PropTypes.bool,
+  children: PropTypes.node,
+  onClick: PropTypes.func,
+  borderColor: PropTypes.string,
+};
+
+CardDataStats.defaultProps = {
+  rate: '',
+  levelUp: false,
+  children: null,
+  onClick: () => {},
+  borderColor: '#4F46E5', // Default to indigo if no color is provided
 };
 
 export default CardDataStats;
